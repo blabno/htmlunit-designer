@@ -16,7 +16,7 @@
 
     <scm>
         <connection>scm:git:git://github.com/blabno/htmlunit-designer.git</connection>
-        <developerConnection>scm:git:git@github.com:blabno/htmlunit-designer.git</developerConnection>
+        <developerConnection>scm:git:https://blabno@github.com/blabno/htmlunit-designer.git</developerConnection>
         <url>https://github.com/blabno/htmlunit-designer</url>
     </scm>
 

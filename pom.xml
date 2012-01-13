@@ -20,17 +20,16 @@
         <url>https://github.com/blabno/htmlunit-designer</url>
     </scm>
 
-    <distributionManagement>
-        <repository>
-            <id>it-crowd.com.pl</id>
-            <name>IT Crowd company Internal Repository</name>
-            <url>http://artifactory.it-crowd.com.pl/libs-release-local</url>
-        </repository>
-        <snapshotRepository>
-            <id>it-crowd.com.pl</id>
-            <name>IT Crowd company Internal Repository</name>
-            <url>http://artifactory.it-crowd.com.pl/libs-snapshot-local</url>
-        </snapshotRepository>
-    </distributionManagement>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

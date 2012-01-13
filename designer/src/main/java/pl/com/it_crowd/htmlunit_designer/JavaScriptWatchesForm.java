@@ -3,13 +3,6 @@ package pl.com.it_crowd.htmlunit_designer;
 import javax.swing.*;
 import java.awt.*;
 
-/**
- * Created by IntelliJ IDEA.
- * User: bernard
- * Date: 1/12/12
- * Time: 1:02 PM
- * To change this template use File | Settings | File Templates.
- */
 public class JavaScriptWatchesForm {
 // ------------------------------ FIELDS ------------------------------
 
@@ -45,6 +38,7 @@ public class JavaScriptWatchesForm {
         rootComponent.setLayout(new BorderLayout(0, 0));
         final JLabel label1 = new JLabel();
         label1.setText("JavaScriptWatches");
+        label1.setToolTipText("Not implemented yet");
         rootComponent.add(label1, BorderLayout.CENTER);
     }
 }

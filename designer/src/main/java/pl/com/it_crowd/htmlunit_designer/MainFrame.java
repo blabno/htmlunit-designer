@@ -1,23 +1,21 @@
 package pl.com.it_crowd.htmlunit_designer;
 
-import bsh.EvalError;
-import com.gargoylesoftware.htmlunit.Page;
-import com.gargoylesoftware.htmlunit.SgmlPage;
 import com.gargoylesoftware.htmlunit.WebRequest;
 import com.gargoylesoftware.htmlunit.WebResponse;
-import com.gargoylesoftware.htmlunit.WebWindow;
-import com.gargoylesoftware.htmlunit.WebWindowAdapter;
-import com.gargoylesoftware.htmlunit.WebWindowEvent;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 public class MainFrame extends JFrame {
 // ------------------------------ FIELDS ------------------------------
@@ -32,11 +30,17 @@ public class MainFrame extends JFrame {
 
     private ConsoleForm consoleForm;
 
-    private JTextArea editorTextArea;
+    private JPanel editor;
+
+    private EditorForm editorForm;
+
+    private final JFileChooser fileChooser = new JFileChooser();
 
     private JavaScriptWatchesForm javaScriptWatchesForm;
 
-    private JTextArea pageSourceTextArea;
+    private JPanel pageSource;
+
+    private PageSourceForm pageSourceForm;
 
     private JTextArea requestSourceTextArea;
 
@@ -50,98 +54,20 @@ public class MainFrame extends JFrame {
 
     public MainFrame()
     {
+        MainFrame.this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         appModel = new AppModel();
-        appModel.getSettings().addPropertiChangeListener(new PropertyChangeListener() {
-            public void propertyChange(PropertyChangeEvent evt)
-            {
-                if (Settings.watchesVisibleProperty.equals(evt.getPropertyName())) {
-                    if ((Boolean) evt.getNewValue()) {
-                        showWatches();
-                    } else {
-                        hideWatches();
-                    }
-                } else if (Settings.javaScriptWatchesVisibleProperty.equals(evt.getPropertyName())) {
-                    if ((Boolean) evt.getNewValue()) {
-                        showJavaScriptWatches();
-                    } else {
-                        hideJavaScriptWatches();
-                    }
-                }
-            }
-        });
         $$$setupUI$$$();
+        setupSettingsListener();
         setContentPane(rootComponent);
-        JMenuBar menubar = new JMenuBar();
-        setJMenuBar(menubar);
-        JMenu fileMenu = new JMenu("File");
-        fileMenu.add(new JMenuItem(new SaveAction()));
-        menubar.add(fileMenu);
-        JMenu viewMenu = new JMenu("View");
-        menubar.add(viewMenu);
-        viewMenu.add(createJCheckBoxMenuItem("Watches", appModel.getSettings().isWatchesVisible(), new ToggleWatchesAction()));
-        viewMenu.add(createJCheckBoxMenuItem("JavaScript Watches", appModel.getSettings().isJavaScriptWatchesVisible(), new ToggleJavaScriptWatchesAction()));
+        setupMenu();
+        setupAppModelListener();
+        setupWindowCloseListener();
         if (!appModel.getSettings().isWatchesVisible()) {
             hideWatches();
         }
         if (!appModel.getSettings().isJavaScriptWatchesVisible()) {
             hideJavaScriptWatches();
         }
-        appModel.getWebClient().addWebWindowListener(new WebWindowAdapter() {
-            @Override
-            public void webWindowContentChanged(WebWindowEvent event)
-            {
-                Page page = event.getNewPage();
-                WebWindow currentWindow = event.getWebWindow().getWebClient().getCurrentWindow();
-                if (currentWindow != null && !currentWindow.equals(event.getWebWindow())) {
-                    return;
-                }
-                if (page instanceof SgmlPage) {
-                    pageSourceTextArea.setText(((SgmlPage) page).asXml());
-                } else {
-                    System.out.println(page);
-                }
-            }
-        });
-        appModel.addPropertyChangeListener(new PropertyChangeListener() {
-            public void propertyChange(PropertyChangeEvent evt)
-            {
-                if (AppModel.selectedResponseProperty.equals(evt.getPropertyName())) {
-                    WebResponse response = (WebResponse) evt.getNewValue();
-                    if (response == null) {
-                        requestSourceTextArea.setText("");
-                        return;
-                    }
-                    WebRequest request = response.getWebRequest();
-                    StringBuilder builder = new StringBuilder(request.getRequestParameters().toString());
-                    builder.append("\n\n");
-                    builder.append(response.getContentAsString());
-                    requestSourceTextArea.setText(builder.toString());
-                    requestSourceTextArea.repaint();
-                }
-            }
-        });
-        editorTextArea.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyReleased(KeyEvent e)
-            {
-                if (KeyUtils.isEvaluateCombination(e)) {
-                    try {
-                        appModel.getInterpreter().eval(editorTextArea.getText());
-                        consoleForm.getJConsole().enter();
-                    } catch (EvalError evalError) {
-                        consoleForm.getJConsole().error(evalError);
-                        consoleForm.getJConsole().println();
-                    }
-                }
-            }
-        });
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e)
-            {
-                new SaveAction().actionPerformed(null);
-            }
-        });
         consoleForm.getJConsole().loadHistory("history.txt");
     }
 
@@ -175,21 +101,19 @@ public class MainFrame extends JFrame {
         centralTabs = new JTabbedPane();
         centralTabs.setPreferredSize(new Dimension(400, 200));
         splitPane2.setLeftComponent(centralTabs);
+        editor = new JPanel();
+        editor.setLayout(new BorderLayout(0, 0));
+        centralTabs.addTab("Editor", editor);
+        editor.add(editorForm.$$$getRootComponent$$$(), BorderLayout.CENTER);
+        pageSource = new JPanel();
+        pageSource.setLayout(new BorderLayout(0, 0));
+        centralTabs.addTab("Current page source", pageSource);
+        pageSource.add(pageSourceForm.$$$getRootComponent$$$(), BorderLayout.CENTER);
         final JScrollPane scrollPane1 = new JScrollPane();
-        centralTabs.addTab("Editor", scrollPane1);
-        editorTextArea = new JTextArea();
-        editorTextArea.setText("");
-        scrollPane1.setViewportView(editorTextArea);
-        final JScrollPane scrollPane2 = new JScrollPane();
-        centralTabs.addTab("Curren page source", scrollPane2);
-        pageSourceTextArea = new JTextArea();
-        pageSourceTextArea.setEditable(false);
-        scrollPane2.setViewportView(pageSourceTextArea);
-        final JScrollPane scrollPane3 = new JScrollPane();
-        centralTabs.addTab("Request", scrollPane3);
+        centralTabs.addTab("Request", scrollPane1);
         requestSourceTextArea = new JTextArea();
         requestSourceTextArea.setEditable(false);
-        scrollPane3.setViewportView(requestSourceTextArea);
+        scrollPane1.setViewportView(requestSourceTextArea);
         final JSplitPane splitPane3 = new JSplitPane();
         splitPane3.setOrientation(0);
         splitPane2.setRightComponent(splitPane3);
@@ -212,10 +136,58 @@ public class MainFrame extends JFrame {
         return checkBoxMenuItem;
     }
 
+    private JMenuItem createMenuItem(char mnemonicChar, KeyStroke accelerator, Action action)
+    {
+        JMenuItem item = new JMenuItem(action);
+        item.setMnemonic(mnemonicChar);
+        item.setAccelerator(accelerator);
+        return item;
+    }
+
     private void createUIComponents()
     {
         consoleForm = new ConsoleForm(appModel);
+        editorForm = new EditorForm(appModel);
+        pageSourceForm = new PageSourceForm(appModel);
         XHRRequestsForm = new XHRRequestsForm(appModel);
+    }
+
+    private void handleEditorFileChanged(File newFile)
+    {
+        String text;
+        updateEditorTabLabel();
+        if (newFile == null) {
+            text = "";
+        } else {
+            try {
+                text = FileUtils.readFileToString(newFile);
+            } catch (IOException e) {
+                reportException("Cannot read file" + newFile.getAbsolutePath(), e);
+                return;
+            }
+        }
+        appModel.setEditorText(text);
+        centralTabs.setSelectedComponent(editor);
+        appModel.setEditorTextModified(false);
+    }
+
+    private void handleEditorTextModified()
+    {
+        updateEditorTabLabel();
+    }
+
+    private void handleResponseSelected(WebResponse response)
+    {
+        if (response == null) {
+            requestSourceTextArea.setText("");
+            return;
+        }
+        WebRequest request = response.getWebRequest();
+        StringBuilder builder = new StringBuilder(request.getRequestParameters().toString());
+        builder.append("\n\n");
+        builder.append(response.getContentAsString());
+        requestSourceTextArea.setText(builder.toString());
+        requestSourceTextArea.repaint();
     }
 
     private void hideJavaScriptWatches()
@@ -234,6 +206,123 @@ public class MainFrame extends JFrame {
         }
     }
 
+    private void reportException(String message, IOException e)
+    {
+        logger.error(message, e);
+        JOptionPane.showMessageDialog(this, message, "Exception", JOptionPane.ERROR_MESSAGE);
+    }
+
+    private boolean save()
+    {
+        String editorText = appModel.getEditorText();
+        File selectedFile;
+        if (appModel.getEditorFile() == null) {
+            fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+            fileChooser.setMultiSelectionEnabled(false);
+            if (fileChooser.showSaveDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION) {
+                selectedFile = fileChooser.getSelectedFile();
+            } else {
+                return false;
+            }
+        } else {
+            selectedFile = appModel.getEditorFile();
+        }
+        try {
+            IOUtils.write(editorText, new FileOutputStream(selectedFile));
+            appModel.setEditorTextModified(false);
+            appModel.setEditorFile(selectedFile);
+            return true;
+        } catch (IOException e1) {
+            reportException("Cannot save editor file", e1);
+            return false;
+        }
+    }
+
+    private boolean saveIfNecessary()
+    {
+        consoleForm.getJConsole().saveHistory("history.txt");
+        appModel.getSettings().save();
+        if (!appModel.isEditorTextModified()) {
+            return true;
+        } else {
+            int result = JOptionPane.showConfirmDialog(this, "Do you want to save editor changes?", "Changes", JOptionPane.YES_NO_CANCEL_OPTION,
+                JOptionPane.QUESTION_MESSAGE);
+            if (result == JOptionPane.YES_OPTION) {
+                return save();
+            } else {
+                return result == JOptionPane.NO_OPTION;
+            }
+        }
+    }
+
+    private void setupAppModelListener()
+    {
+        appModel.addPropertyChangeListener(new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent evt)
+            {
+                if (AppModel.selectedResponseProperty.equals(evt.getPropertyName())) {
+                    handleResponseSelected((WebResponse) evt.getNewValue());
+                } else if (AppModel.editorFileProperty.equals(evt.getPropertyName())) {
+                    handleEditorFileChanged((File) evt.getNewValue());
+                } else if (AppModel.editorTextModifiedProperty.equals(evt.getPropertyName())) {
+                    handleEditorTextModified();
+                }
+            }
+        });
+    }
+
+    private void setupMenu()
+    {
+        JMenuBar menubar = new JMenuBar();
+        setJMenuBar(menubar);
+        JMenu fileMenu = new JMenu("File");
+        fileMenu.setMnemonic('f');
+        fileMenu.add(createMenuItem('n', KeyStroke.getKeyStroke(KeyEvent.VK_N, KeyEvent.CTRL_DOWN_MASK), new NewAction()));
+        fileMenu.add(createMenuItem('o', KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.CTRL_DOWN_MASK), new OpenAction()));
+        fileMenu.add(createMenuItem('s', KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK), new SaveAction()));
+        menubar.add(fileMenu);
+        JMenu viewMenu = new JMenu("View");
+        viewMenu.setMnemonic('v');
+        menubar.add(viewMenu);
+        viewMenu.add(createJCheckBoxMenuItem("Watches", appModel.getSettings().isWatchesVisible(), new ToggleWatchesAction()));
+        viewMenu.add(createJCheckBoxMenuItem("JavaScript Watches", appModel.getSettings().isJavaScriptWatchesVisible(), new ToggleJavaScriptWatchesAction()));
+    }
+
+    private void setupSettingsListener()
+    {
+        appModel.getSettings().addPropertiChangeListener(new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent evt)
+            {
+                if (Settings.watchesVisibleProperty.equals(evt.getPropertyName())) {
+                    if ((Boolean) evt.getNewValue()) {
+                        showWatches();
+                    } else {
+                        hideWatches();
+                    }
+                } else if (Settings.javaScriptWatchesVisibleProperty.equals(evt.getPropertyName())) {
+                    if ((Boolean) evt.getNewValue()) {
+                        showJavaScriptWatches();
+                    } else {
+                        hideJavaScriptWatches();
+                    }
+                }
+            }
+        });
+    }
+
+    private void setupWindowCloseListener()
+    {
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e)
+            {
+                if (saveIfNecessary()) {
+                    MainFrame.this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                }
+            }
+        });
+    }
+
     private void showJavaScriptWatches()
     {
         if (!watchesPanel.equals(javaScriptWatchesForm.$$$getRootComponent$$$().getParent())) {
@@ -250,7 +339,66 @@ public class MainFrame extends JFrame {
         }
     }
 
+    private void updateEditorTabLabel()
+    {
+        int index = centralTabs.indexOfComponent(editor);
+        String label = appModel.getEditorFile() == null ? "Editor" : appModel.getEditorFile().getName();
+        centralTabs.setTitleAt(index, label + (appModel.isEditorTextModified() ? " *" : ""));
+    }
+
 // -------------------------- INNER CLASSES --------------------------
+
+    private class NewAction extends AbstractAction {
+// --------------------------- CONSTRUCTORS ---------------------------
+
+        private NewAction()
+        {
+            super("New");
+        }
+
+// ------------------------ INTERFACE METHODS ------------------------
+
+
+// --------------------- Interface ActionListener ---------------------
+
+        public void actionPerformed(ActionEvent e)
+        {
+            if (saveIfNecessary()) {
+                appModel.setEditorFile(null);
+            }
+        }
+    }
+
+    private class OpenAction extends AbstractAction {
+// --------------------------- CONSTRUCTORS ---------------------------
+
+        private OpenAction()
+        {
+            super("Open");
+        }
+
+// ------------------------ INTERFACE METHODS ------------------------
+
+
+// --------------------- Interface ActionListener ---------------------
+
+        public void actionPerformed(ActionEvent e)
+        {
+            if (saveIfNecessary()) {
+                fileChooser.setCurrentDirectory(new File(appModel.getSettings().getFileChooserCurrentDirectory()));
+                fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+                fileChooser.setMultiSelectionEnabled(false);
+                if (appModel.getEditorFile() != null) {
+                    fileChooser.setSelectedFile(appModel.getEditorFile());
+                }
+                if (fileChooser.showOpenDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION) {
+                    File selectedFile = fileChooser.getSelectedFile();
+                    appModel.setEditorFile(selectedFile);
+                    appModel.getSettings().setFileChooserCurrentDirectory(fileChooser.getCurrentDirectory().getAbsolutePath());
+                }
+            }
+        }
+    }
 
     private class SaveAction extends AbstractAction {
 // --------------------------- CONSTRUCTORS ---------------------------
@@ -267,8 +415,7 @@ public class MainFrame extends JFrame {
 
         public void actionPerformed(ActionEvent e)
         {
-            consoleForm.getJConsole().saveHistory("history.txt");
-            appModel.getSettings().save();
+            save();
         }
     }
 
@@ -306,7 +453,6 @@ public class MainFrame extends JFrame {
         dialog.setMinimumSize(new Dimension(400, 200));
         dialog.pack();
         dialog.setVisible(true);
-        dialog.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         dialog.appModel.startInterpreterThread();
     }
 }

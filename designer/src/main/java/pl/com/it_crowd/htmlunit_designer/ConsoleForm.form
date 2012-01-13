@@ -50,7 +50,9 @@
                 <children>
                   <component id="c8d20" class="javax.swing.JTextArea" binding="textArea">
                     <constraints/>
-                    <properties/>
+                    <properties>
+                      <text value="/** F5 or CTRL+ENTER to execute */  "/>
+                    </properties>
                   </component>
                 </children>
               </scrollpane>

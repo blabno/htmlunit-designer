@@ -38,6 +38,7 @@ public class WatchesForm {
         rootComponent.setLayout(new BorderLayout(0, 0));
         final JLabel label1 = new JLabel();
         label1.setText("Watches");
+        label1.setToolTipText("Not implemented yet");
         rootComponent.add(label1, BorderLayout.CENTER);
     }
 }

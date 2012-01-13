@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="pl.com.it_crowd.htmlunit_designer.XHRRequestsForm">
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="pl.com.it_crowd.htmlunit_designer.PageSourceForm">
   <grid id="27dc6" binding="rootComponent" layout-manager="BorderLayout" hgap="0" vgap="0">
     <constraints>
       <xy x="20" y="20" width="500" height="400"/>
@@ -7,26 +7,32 @@
     <properties/>
     <border type="none"/>
     <children>
-      <scrollpane id="20832">
+      <scrollpane id="228e4">
         <constraints border-constraint="Center"/>
         <properties/>
         <border type="none"/>
         <children>
-          <component id="23273" class="javax.swing.JTable" binding="table">
+          <component id="35eea" class="javax.swing.JTextArea" binding="pageSourceTextArea">
             <constraints/>
-            <properties/>
+            <properties>
+              <editable value="false"/>
+            </properties>
           </component>
         </children>
       </scrollpane>
-      <grid id="ab965" layout-manager="BorderLayout" hgap="0" vgap="0">
+      <grid id="97a86" binding="searchPanel" layout-manager="BorderLayout" hgap="0" vgap="0">
         <constraints border-constraint="North"/>
         <properties/>
         <border type="none"/>
         <children>
-          <component id="1eae2" class="javax.swing.JButton" binding="button">
+          <component id="14a58" class="javax.swing.JTextField" binding="searchTextField">
+            <constraints border-constraint="Center"/>
+            <properties/>
+          </component>
+          <component id="5026b" class="javax.swing.JButton" binding="searchButton">
             <constraints border-constraint="East"/>
             <properties>
-              <text value="Clear"/>
+              <text value="Search"/>
             </properties>
           </component>
         </children>

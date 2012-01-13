@@ -55,6 +55,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -393,6 +394,8 @@ public class JConsole extends JScrollPane implements GUIConsoleInterface, Runnab
                 history.add(line);
             }
             reader.close();
+        } catch (FileNotFoundException e) {
+            //no history file is not a problem
         } catch (IOException e1) {
             logger.error("Cannot read command history from " + fileName, e1);
         }

@@ -8,6 +8,8 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.List;
@@ -16,6 +18,8 @@ public class XHRRequestsForm {
 // ------------------------------ FIELDS ------------------------------
 
     private AppModel appModel;
+
+    private JButton button;
 
     private JPanel rootComponent;
 
@@ -26,24 +30,8 @@ public class XHRRequestsForm {
     public XHRRequestsForm(AppModel appModel)
     {
         this.appModel = appModel;
-        table.setModel(new MyTableModel());
-        table.getColumnModel().getColumn(0).setPreferredWidth(40);
-        table.getColumnModel().getColumn(0).setMaxWidth(40);
-        table.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-            public void valueChanged(ListSelectionEvent e)
-            {
-                List<WebResponse> responses = XHRRequestsForm.this.appModel.getResponses();
-                if (e.getFirstIndex() < 0) {
-                    return;
-                }
-                if (responses.size() <= e.getFirstIndex()) {
-                    XHRRequestsForm.this.appModel.setSelectedResponse(null);
-                } else {
-                    XHRRequestsForm.this.appModel.setSelectedResponse(responses.get(e.getFirstIndex()));
-                }
-            }
-        });
+        setupTabel();
+        setupActionListeners(appModel);
     }
 
     {
@@ -78,6 +66,44 @@ public class XHRRequestsForm {
         rootComponent.add(scrollPane1, BorderLayout.CENTER);
         table = new JTable();
         scrollPane1.setViewportView(table);
+        final JPanel panel1 = new JPanel();
+        panel1.setLayout(new BorderLayout(0, 0));
+        rootComponent.add(panel1, BorderLayout.NORTH);
+        button = new JButton();
+        button.setText("Clear");
+        panel1.add(button, BorderLayout.EAST);
+    }
+
+    private void setupActionListeners(final AppModel appModel)
+    {
+        button.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e)
+            {
+                appModel.clearResponses();
+            }
+        });
+    }
+
+    private void setupTabel()
+    {
+        table.setModel(new MyTableModel());
+        table.getColumnModel().getColumn(0).setPreferredWidth(40);
+        table.getColumnModel().getColumn(0).setMaxWidth(40);
+        table.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            public void valueChanged(ListSelectionEvent e)
+            {
+                List<WebResponse> responses = appModel.getResponses();
+                if (e.getFirstIndex() < 0) {
+                    return;
+                }
+                if (responses.size() <= e.getFirstIndex()) {
+                    appModel.setSelectedResponse(null);
+                } else {
+                    appModel.setSelectedResponse(responses.get(e.getFirstIndex()));
+                }
+            }
+        });
     }
 
 // -------------------------- INNER CLASSES --------------------------
@@ -112,6 +138,19 @@ public class XHRRequestsForm {
         public int getColumnCount()
         {
             return 2;
+        }
+
+        @Override
+        public String getColumnName(int columnIndex)
+        {
+            switch (columnIndex) {
+                case 0:
+                    return "Method";
+                case 1:
+                    return "URL";
+                default:
+                    return null;
+            }
         }
 
         public Object getValueAt(int rowIndex, int columnIndex)

@@ -156,6 +156,7 @@ public class ConsoleForm {
         textareaScrollPane = new JScrollPane();
         splitPane.setRightComponent(textareaScrollPane);
         textArea = new JTextArea();
+        textArea.setText("/** F5 or CTRL+ENTER to execute */  ");
         textareaScrollPane.setViewportView(textArea);
         JConsolePanel = new JPanel();
         JConsolePanel.setLayout(new BorderLayout(0, 0));

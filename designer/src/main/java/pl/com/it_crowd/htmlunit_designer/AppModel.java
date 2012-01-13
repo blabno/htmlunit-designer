@@ -12,6 +12,7 @@ import com.gargoylesoftware.htmlunit.util.WebConnectionWrapper;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -20,11 +21,23 @@ import java.util.List;
 public class AppModel {
 // ------------------------------ FIELDS ------------------------------
 
+    public static final String editorFileProperty = "editorFile";
+
+    public static final String editorTextModifiedProperty = "editorTextModified";
+
+    public static final String editorTextProperty = "editorText";
+
     public static final String responsesProperty = "responses";
 
     public static final String selectedResponseProperty = "selectedResponse";
 
     private static Logger logger = Logger.getLogger(AppModel.class);
+
+    private File editorFile;
+
+    private String editorText;
+
+    private boolean editorTextModified;
 
     private Interpreter interpreter;
 
@@ -51,6 +64,7 @@ public class AppModel {
         settings = new Settings();
         nameCompletion = new NameCompletionTable();
         nameCompletion.add("print(");
+        nameCompletion.add("import ");
         responses = new ArrayList<WebResponse>();
         unmodifiableResponses = Collections.unmodifiableList(responses);
         webClient = new WebClient(BrowserVersion.FIREFOX_3_6);
@@ -58,6 +72,16 @@ public class AppModel {
     }
 
 // --------------------- GETTER / SETTER METHODS ---------------------
+
+    public File getEditorFile()
+    {
+        return editorFile;
+    }
+
+    public String getEditorText()
+    {
+        return editorText;
+    }
 
     public Interpreter getInterpreter()
     {
@@ -89,6 +113,11 @@ public class AppModel {
         return webClient;
     }
 
+    public boolean isEditorTextModified()
+    {
+        return editorTextModified;
+    }
+
 // -------------------------- OTHER METHODS --------------------------
 
     public void addPropertyChangeListener(PropertyChangeListener listener)
@@ -96,9 +125,36 @@ public class AppModel {
         propertyChangeSupport.addPropertyChangeListener(listener);
     }
 
+    public void clearResponses()
+    {
+        responses.clear();
+        propertyChangeSupport.firePropertyChange(responsesProperty, null, responses);
+    }
+
     public List<WebResponse> getResponses()
     {
         return unmodifiableResponses;
+    }
+
+    public void setEditorFile(File editorFile)
+    {
+        File oldValue = this.editorFile;
+        this.editorFile = editorFile;
+        propertyChangeSupport.firePropertyChange(editorFileProperty, oldValue, editorFile);
+    }
+
+    public void setEditorText(String editorText)
+    {
+        String oldValue = this.editorText;
+        this.editorText = editorText;
+        propertyChangeSupport.firePropertyChange(editorTextProperty, oldValue, editorText);
+    }
+
+    public void setEditorTextModified(boolean editorTextModified)
+    {
+        boolean oldValue = this.editorTextModified;
+        this.editorTextModified = editorTextModified;
+        propertyChangeSupport.firePropertyChange(editorTextModifiedProperty, oldValue, editorTextModified);
     }
 
     public void setSelectedResponse(WebResponse selectedResponse)

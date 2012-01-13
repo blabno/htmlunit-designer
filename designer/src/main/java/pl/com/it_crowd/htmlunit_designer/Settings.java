@@ -13,6 +13,8 @@ import java.util.Properties;
 public class Settings {
 // ------------------------------ FIELDS ------------------------------
 
+    public static final String fileChooserCurrentDirectoryProperty = "fileChooserCurrentDirectory";
+
     public static final String javaScriptWatchesVisibleProperty = "javaScriptWatchesVisible";
 
     public static final String watchesVisibleProperty = "watchesVisible";
@@ -20,6 +22,8 @@ public class Settings {
     private static Logger logger = Logger.getLogger(Settings.class);
 
     private static final String settingsFileName = "settings.properties";
+
+    private String fileChooserCurrentDirectory = ".";
 
     private boolean javaScriptWatchesVisible;
 
@@ -52,14 +56,9 @@ public class Settings {
 
 // --------------------- GETTER / SETTER METHODS ---------------------
 
-    public PropertyChangeSupport getPropertyChangeSupport()
+    public String getFileChooserCurrentDirectory()
     {
-        return propertyChangeSupport;
-    }
-
-    public void setPropertyChangeSupport(PropertyChangeSupport propertyChangeSupport)
-    {
-        this.propertyChangeSupport = propertyChangeSupport;
+        return fileChooserCurrentDirectory;
     }
 
     public boolean isJavaScriptWatchesVisible()
@@ -94,6 +93,13 @@ public class Settings {
         } catch (IOException e) {
             logger.error("Cannot save settings to file", e);
         }
+    }
+
+    public void setFileChooserCurrentDirectory(String fileChooserCurrentDirectory)
+    {
+        String oldValue = this.fileChooserCurrentDirectory;
+        this.fileChooserCurrentDirectory = fileChooserCurrentDirectory;
+        propertyChangeSupport.firePropertyChange(fileChooserCurrentDirectoryProperty, oldValue, fileChooserCurrentDirectory);
     }
 
     public void setJavaScriptWatchesVisible(boolean javaScriptWatchesVisible)

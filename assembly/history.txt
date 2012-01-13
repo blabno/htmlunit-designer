@@ -1,0 +1,1 @@
+p=client.getPage("http://schoolmanager.pl");

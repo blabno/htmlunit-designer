@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="pl.com.it_crowd.htmlunit_designer.MainFrame">
+  <grid id="cbd77" binding="rootComponent" layout-manager="BorderLayout" hgap="0" vgap="0">
+    <constraints>
+      <xy x="48" y="54" width="639" height="546"/>
+    </constraints>
+    <properties/>
+    <border type="none"/>
+    <children>
+      <splitpane id="f1d32">
+        <constraints border-constraint="Center"/>
+        <properties>
+          <orientation value="0"/>
+        </properties>
+        <border type="none"/>
+        <children>
+          <splitpane id="dc1af">
+            <constraints>
+              <splitpane position="left"/>
+            </constraints>
+            <properties/>
+            <border type="none"/>
+            <children>
+              <tabbedpane id="ab039" binding="centralTabs">
+                <constraints>
+                  <splitpane position="left"/>
+                </constraints>
+                <properties>
+                  <preferredSize width="400" height="200"/>
+                </properties>
+                <border type="none"/>
+                <children>
+                  <scrollpane id="cd713">
+                    <constraints>
+                      <tabbedpane title="Editor"/>
+                    </constraints>
+                    <properties/>
+                    <border type="none"/>
+                    <children>
+                      <component id="f7c97" class="javax.swing.JTextArea" binding="editorTextArea">
+                        <constraints/>
+                        <properties>
+                          <text value=""/>
+                        </properties>
+                      </component>
+                    </children>
+                  </scrollpane>
+                  <scrollpane id="c5b88">
+                    <constraints>
+                      <tabbedpane title="Curren page source"/>
+                    </constraints>
+                    <properties/>
+                    <border type="none"/>
+                    <children>
+                      <component id="d98bd" class="javax.swing.JTextArea" binding="pageSourceTextArea">
+                        <constraints/>
+                        <properties>
+                          <editable value="false"/>
+                        </properties>
+                      </component>
+                    </children>
+                  </scrollpane>
+                  <scrollpane id="8ade9">
+                    <constraints>
+                      <tabbedpane title="Request"/>
+                    </constraints>
+                    <properties/>
+                    <border type="none"/>
+                    <children>
+                      <component id="8ab03" class="javax.swing.JTextArea" binding="requestSourceTextArea">
+                        <constraints/>
+                        <properties>
+                          <editable value="false"/>
+                        </properties>
+                      </component>
+                    </children>
+                  </scrollpane>
+                </children>
+              </tabbedpane>
+              <splitpane id="2c4f8">
+                <constraints>
+                  <splitpane position="right"/>
+                </constraints>
+                <properties>
+                  <orientation value="0"/>
+                </properties>
+                <border type="none"/>
+                <children>
+                  <splitpane id="a7734" binding="watchesPanel">
+                    <constraints>
+                      <splitpane position="right"/>
+                    </constraints>
+                    <properties>
+                      <orientation value="0"/>
+                    </properties>
+                    <border type="none"/>
+                    <children>
+                      <nested-form id="e1c54" form-file="pl/com/it_crowd/htmlunit_designer/WatchesForm.form" binding="watchesForm">
+                        <constraints>
+                          <splitpane position="left"/>
+                        </constraints>
+                      </nested-form>
+                      <nested-form id="cc70f" form-file="pl/com/it_crowd/htmlunit_designer/JavaScriptWatchesForm.form" binding="javaScriptWatchesForm">
+                        <constraints>
+                          <splitpane position="right"/>
+                        </constraints>
+                      </nested-form>
+                    </children>
+                  </splitpane>
+                  <nested-form id="642c2" form-file="pl/com/it_crowd/htmlunit_designer/XHRRequestsForm.form" binding="XHRRequestsForm" custom-create="true" default-binding="true">
+                    <constraints>
+                      <splitpane position="left"/>
+                    </constraints>
+                  </nested-form>
+                </children>
+              </splitpane>
+            </children>
+          </splitpane>
+          <nested-form id="5248e" form-file="pl/com/it_crowd/htmlunit_designer/ConsoleForm.form" binding="consoleForm" custom-create="true">
+            <constraints>
+              <splitpane position="right"/>
+            </constraints>
+          </nested-form>
+        </children>
+      </splitpane>
+    </children>
+  </grid>
+</form>

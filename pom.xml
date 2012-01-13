@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>pl.com.it-crowd.htmlunit-designer</groupId>
+    <artifactId>htmlunit-designer-agregator</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>parent</module>
+        <module>designer</module>
+        <module>assembly</module>
+    </modules>
+
+    <scm>
+        <connection>scm:git:git://github.com/blabno/htmlunit-designer.git</connection>
+        <developerConnection>scm:git:git@github.com:blabno/htmlunit-designer.git</developerConnection>
+        <url>https://github.com/blabno/htmlunit-designer</url>
+    </scm>
+
+    <distributionManagement>
+        <repository>
+            <id>it-crowd.com.pl</id>
+            <name>IT Crowd company Internal Repository</name>
+            <url>http://artifactory.it-crowd.com.pl/libs-release-local</url>
+        </repository>
+        <snapshotRepository>
+            <id>it-crowd.com.pl</id>
+            <name>IT Crowd company Internal Repository</name>
+            <url>http://artifactory.it-crowd.com.pl/libs-snapshot-local</url>
+        </snapshotRepository>
+    </distributionManagement>
+
+</project>

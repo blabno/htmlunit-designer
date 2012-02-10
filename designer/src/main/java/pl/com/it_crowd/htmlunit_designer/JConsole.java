@@ -362,6 +362,11 @@ public class JConsole extends JScrollPane implements GUIConsoleInterface, Runnab
 
 // -------------------------- OTHER METHODS --------------------------
 
+    public void clear()
+    {
+        text.setText("");
+    }
+
     public void enter()
     {
         String s = getCmd();

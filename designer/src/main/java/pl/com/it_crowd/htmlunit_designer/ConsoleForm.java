@@ -21,6 +21,8 @@ public class ConsoleForm {
 
     private AppModel appModel;
 
+    private JButton clearButton;
+
     private JPanel consolePanel;
 
     /**
@@ -62,6 +64,12 @@ public class ConsoleForm {
                 } else {
                     setSingleLineLayout();
                 }
+            }
+        });
+        clearButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e)
+            {
+                JConsole.clear();
             }
         });
         textArea.addKeyListener(new KeyAdapter() {
@@ -142,9 +150,15 @@ public class ConsoleForm {
         panel1.setMinimumSize(new Dimension(133, 29));
         panel1.setPreferredSize(new Dimension(133, 29));
         rootComponent.add(panel1, BorderLayout.NORTH);
+        final JPanel panel2 = new JPanel();
+        panel2.setLayout(new BorderLayout(0, 0));
+        panel1.add(panel2, BorderLayout.EAST);
+        clearButton = new JButton();
+        clearButton.setText("Clear");
+        panel2.add(clearButton, BorderLayout.CENTER);
         switchLayoutButton = new JButton();
         switchLayoutButton.setText("Switch layout");
-        panel1.add(switchLayoutButton, BorderLayout.EAST);
+        panel2.add(switchLayoutButton, BorderLayout.EAST);
         consolePanel = new JPanel();
         consolePanel.setLayout(new BorderLayout(0, 0));
         rootComponent.add(consolePanel, BorderLayout.CENTER);

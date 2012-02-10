@@ -50,6 +50,14 @@ public class MainFrame extends JFrame {
 
     private JSplitPane watchesPanel;
 
+// -------------------------- STATIC METHODS --------------------------
+
+    static void reportException(Component parent, String message, IOException e)
+    {
+        logger.error(message, e);
+        JOptionPane.showMessageDialog(parent, message, "Exception", JOptionPane.ERROR_MESSAGE);
+    }
+
 // --------------------------- CONSTRUCTORS ---------------------------
 
     public MainFrame()
@@ -155,7 +163,6 @@ public class MainFrame extends JFrame {
     private void handleEditorFileChanged(File newFile)
     {
         String text;
-        updateEditorTabLabel();
         if (newFile == null) {
             text = "";
         } else {
@@ -167,8 +174,9 @@ public class MainFrame extends JFrame {
             }
         }
         appModel.setEditorText(text);
-        centralTabs.setSelectedComponent(editor);
         appModel.setEditorTextModified(false);
+        centralTabs.setSelectedComponent(editor);
+        updateEditorTabLabel();
     }
 
     private void handleEditorTextModified()
@@ -208,8 +216,7 @@ public class MainFrame extends JFrame {
 
     private void reportException(String message, IOException e)
     {
-        logger.error(message, e);
-        JOptionPane.showMessageDialog(this, message, "Exception", JOptionPane.ERROR_MESSAGE);
+        reportException(this, message, e);
     }
 
     private boolean save()
@@ -281,6 +288,10 @@ public class MainFrame extends JFrame {
         fileMenu.add(createMenuItem('o', KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.CTRL_DOWN_MASK), new OpenAction()));
         fileMenu.add(createMenuItem('s', KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK), new SaveAction()));
         menubar.add(fileMenu);
+        JMenu editorMenu = new JMenu("Editor");
+        editorMenu.setMnemonic('e');
+        editorMenu.add(createMenuItem('c', null, new ToggleComment()));
+        menubar.add(editorMenu);
         JMenu viewMenu = new JMenu("View");
         viewMenu.setMnemonic('v');
         menubar.add(viewMenu);
@@ -337,6 +348,11 @@ public class MainFrame extends JFrame {
             watchesPanel.setTopComponent(watchesForm.$$$getRootComponent$$$());
             rootComponent.revalidate();
         }
+    }
+
+    private void toggleComment()
+    {
+        editorForm.toggleComment();
     }
 
     private void updateEditorTabLabel()
@@ -419,6 +435,25 @@ public class MainFrame extends JFrame {
         }
     }
 
+    private class ToggleComment extends AbstractAction {
+// --------------------------- CONSTRUCTORS ---------------------------
+
+        private ToggleComment()
+        {
+            super("Toggle comment");
+        }
+
+// ------------------------ INTERFACE METHODS ------------------------
+
+
+// --------------------- Interface ActionListener ---------------------
+
+        public void actionPerformed(ActionEvent e)
+        {
+            toggleComment();
+        }
+    }
+
     private class ToggleJavaScriptWatchesAction extends AbstractAction {
 // ------------------------ INTERFACE METHODS ------------------------
 
@@ -454,5 +489,27 @@ public class MainFrame extends JFrame {
         dialog.pack();
         dialog.setVisible(true);
         dialog.appModel.startInterpreterThread();
+//        String text;
+//        try {
+//            text = IOUtils.toString(new FileInputStream("settings.properties"));
+//            System.out.println(text);
+//            BufferedReader bufferedReader = new BufferedReader(new StringReader(text));
+//            String line;
+//            int pos = 0;
+//            int start = 20, end = 51;
+//            StringBuilder builder = new StringBuilder();
+//            while ((line = bufferedReader.readLine()) != null) {
+//                if (pos >= start && pos <= end || pos < start && start <= pos + line.length()) {
+//                    builder.append("//");
+//                }
+//                pos += line.length() + 1;
+//                builder.append(line).append("\n");
+//            }
+//            System.out.println(pos);
+//            System.out.println(text.length());
+//            System.out.println(builder.toString());
+//        } catch (IOException e) {
+//            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+//        }
     }
 }

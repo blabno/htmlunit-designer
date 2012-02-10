@@ -19,12 +19,25 @@
         </properties>
         <border type="none"/>
         <children>
-          <component id="21ec" class="javax.swing.JButton" binding="switchLayoutButton">
+          <grid id="cee9b" layout-manager="BorderLayout" hgap="0" vgap="0">
             <constraints border-constraint="East"/>
-            <properties>
-              <text value="Switch layout"/>
-            </properties>
-          </component>
+            <properties/>
+            <border type="none"/>
+            <children>
+              <component id="47192" class="javax.swing.JButton" binding="clearButton">
+                <constraints border-constraint="Center"/>
+                <properties>
+                  <text value="Clear"/>
+                </properties>
+              </component>
+              <component id="21ec" class="javax.swing.JButton" binding="switchLayoutButton">
+                <constraints border-constraint="East"/>
+                <properties>
+                  <text value="Switch layout"/>
+                </properties>
+              </component>
+            </children>
+          </grid>
         </children>
       </grid>
       <grid id="63472" binding="consolePanel" layout-manager="BorderLayout" hgap="0" vgap="0">
